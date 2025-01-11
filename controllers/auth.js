@@ -54,10 +54,10 @@ const loginUsuario = async (req, res = response) => {
     const { email,password} = req.body;
     try {
         // Verificar si existe el email
-        const usuarioDB = await Usuario.findOne({email:email});
+        const usuario = await Usuario.findOne({email:email});
 
         // Si no existe el email
-        if (!usuarioDB) {
+        if (!usuario) {
             return res.status(404).json({
                 ok: false,
                 msg: 'Credenciales no validas por favor verifique'
@@ -65,7 +65,7 @@ const loginUsuario = async (req, res = response) => {
         }
 
         // Validar el password
-        const validPassword = bcrypt.compareSync(password, usuarioDB.password);
+        const validPassword = bcrypt.compareSync(password, usuario.password);
         if (!validPassword) {
             return res.status(400).json({
                 ok: false,
@@ -74,12 +74,12 @@ const loginUsuario = async (req, res = response) => {
         }
 
         // Generar JWT
-        const token = await generarJWT(usuarioDB.id);
+        const token = await generarJWT(usuario.id);
 
         // Respuesta exitosa
         res.json({
             ok: true,
-            usuarioDB,
+            usuario,
             token
         });
         
@@ -100,11 +100,11 @@ const renewToken = async (req, res = response) => {
     const token = await generarJWT(uid);
 
     // Obtener el usuario por el uid
-    const usuarioDB = await Usuario.findById(uid);
+    const usuario = await Usuario.findById(uid);
 
     res.json({
         ok: true,
-        usuarioDB,
+        usuario,
         token
     });
 };
